@@ -82,12 +82,12 @@ class PrePublishHook(Hook):
             # report progress:
             progress_cb(0, "Validating", task)
         
-            # pre-publish item here, e.g.
-            #if output["name"] == "foo":
-            #    ...
-            #else:
-            # don't know how to publish this output types!
-            errors.append("Don't know how to publish this item!")        
+            # pre-publish item here
+            if output["name"] == "send_to_review":
+                pass
+            else:
+                # don't know how to publish this output types!
+                errors.append("Don't know how to publish this item!")        
 
             # if there is anything to report then add to result
             if len(errors) > 0:

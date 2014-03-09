@@ -301,10 +301,21 @@ class PublishHandler(object):
         all_outputs = [self._primary_output] + self._secondary_outputs
 
         # first, validate that all items specify a known scene item type:
+        # fitler out any that don't and warn
         output_scene_item_types = set([output.scene_item_type for output in all_outputs])
+        filtered_items = []
+        unknown_types = set()
+        num_unknown = 0
         for item in items:
-            if item.scene_item_type not in output_scene_item_types:
-                raise TankError("Item %s found with unrecognised scene item type %s" % (item.name, item.scene_item_type))
+            if item.scene_item_type in output_scene_item_types:
+                filtered_items.append(item)
+            else:
+                unknown_types.add(item.scene_item_type)
+                num_unknown += 1
+                
+        if num_unknown:
+            self._app.log_warning(("%d publish item(s) were found with an unrecognised scene item type (%s) "
+                                  "and will be ignored") % (num_unknown, ", ".join(unknown_types)))
              
         # Now loop through all outputs and add build list of tasks.
         # Note: this is deliberately output-centric to allow control
@@ -312,7 +323,7 @@ class PublishHandler(object):
         # outputs)
         tasks = []
         for output in all_outputs:
-            for item in items:
+            for item in filtered_items:
                 if item.scene_item_type == output.scene_item_type:
                     tasks.append(Task(item, output))
              

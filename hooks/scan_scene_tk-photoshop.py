@@ -70,4 +70,7 @@ class ScanSceneHook(Hook):
         # create the primary item - this will match the primary output 'scene_item_type':            
         items.append({"type": "work_file", "name": name})
 
+        # add secondary item for sending to review:
+        items.append({"type": "send_to_review", "name": name})
+
         return items
