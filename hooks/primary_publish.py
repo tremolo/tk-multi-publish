@@ -97,6 +97,8 @@ class PrimaryPublishHook(Hook):
             return self._do_photoshop_publish(task, work_template, comment, thumbnail_path, sg_task, progress_cb)
         elif engine_name == "tk-mari":
             return self._do_mari_publish(task, work_template, comment, thumbnail_path, sg_task, progress_cb)        
+        elif engine_name == "tk-modo":
+            return self._do_modo_publish(task, work_template, comment, thumbnail_path, sg_task, progress_cb)        
         else:
             raise TankError("Unable to perform publish for unhandled engine %s" % engine_name)
         
@@ -923,6 +925,87 @@ class PrimaryPublishHook(Hook):
             proj.save()
             
         progress_cb(100)
+
+
+    def _do_modo_publish(self, task, work_template, comment, thumbnail_path, sg_task, progress_cb):
+        """
+        Publish the main Modo scene
+
+        :param task:            The primary task to publish
+        :param work_template:   The primary work template to use
+        :param comment:         The publish description/comment
+        :param thumbnail_path:  The path to the thumbnail to associate with the published file
+        :param sg_task:         The Shotgun task that this publish should be associated with
+        :param progress_cb:     A callback to use when reporting any progress
+                                to the UI
+        :returns:               The path to the file that has been published        
+        """
+        import shotgunsupport
+        
+        progress_cb(0.0, "Finding scene dependencies", task)
+        dependencies = self._modo_find_additional_scene_dependencies()
+        
+        # get scene path
+        scene_path = os.path.abspath(shotgunsupport.get_scene_filename())
+        
+        if not work_template.validate(scene_path):
+            raise TankError("File '%s' is not a valid work path, unable to publish!" % scene_path)
+        
+        # use templates to convert to publish path:
+        output = task["output"]
+        fields = work_template.get_fields(scene_path)
+        fields["TankType"] = output["tank_type"]
+        publish_template = output["publish_template"]
+        publish_path = publish_template.apply_fields(fields)
+        
+        if os.path.exists(publish_path):
+            raise TankError("The published file named '%s' already exists!" % publish_path)
+        
+        # save the scene:
+        progress_cb(10.0, "Saving the scene")
+        self.parent.log_debug("Saving the scene...")
+        shotgunsupport.save_scene()
+        
+        # copy the file:
+        progress_cb(50.0, "Copying the file")
+        try:
+            publish_folder = os.path.dirname(publish_path)
+            self.parent.ensure_folder_exists(publish_folder)
+            self.parent.log_debug("Copying %s --> %s..." % (scene_path, publish_path))
+            self.parent.copy_file(scene_path, publish_path, task)
+        except Exception, e:
+            raise TankError("Failed to copy file from %s to %s - %s" % (scene_path, publish_path, e))
+
+        # work out publish name:
+        publish_name = self._get_publish_name(publish_path, publish_template, fields)
+
+        # finally, register the publish:
+        progress_cb(75.0, "Registering the publish")
+        self._register_publish(publish_path, 
+                               publish_name, 
+                               sg_task, 
+                               fields["version"], 
+                               output["tank_type"],
+                               comment,
+                               thumbnail_path, 
+                               dependencies)
+        
+        progress_cb(100)
+        
+        return publish_path
+        
+    def _modo_find_additional_scene_dependencies(self):
+        """
+        Find additional dependencies from the scene
+        """
+        import shotgunsupport
+        
+        dependencies = []
+        dependencies.extend(shotgunsupport.get_references())
+
+        return dependencies
+    
+
 
     
     def _get_publish_name(self, path, template, fields=None):

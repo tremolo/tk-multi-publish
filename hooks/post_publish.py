@@ -67,6 +67,8 @@ class PostPublishHook(Hook):
             self._do_photoshop_post_publish(work_template, progress_cb)
         elif engine_name == "tk-mari":
             self._do_mari_post_publish(work_template, progress_cb)            
+        elif engine_name == "tk-modo":
+            self._do_modo_post_publish(work_template, progress_cb)     
         else:
             raise TankError("Unable to perform post publish for unhandled engine %s" % engine_name)
         
@@ -397,6 +399,37 @@ class PostPublishHook(Hook):
         """
         # nothing to do for Mari post-publish
         pass
+
+    def _do_modo_post_publish(self, work_template, progress_cb):
+        """
+        Do any Modo post-publish work
+
+        :param work_template:   The primary work template used for the publish
+        :param progress_cb:     Callback to be used when reporting progress
+        """        
+        import shotgunsupport
+        
+        progress_cb(0, "Versioning up the scene file")
+        
+        # get the current scene path:
+        scene_path = os.path.abspath(shotgunsupport.get_scene_filename())
+        
+        # increment version and construct new file name:
+        progress_cb(25, "Finding next version number")
+        fields = work_template.get_fields(scene_path)
+        next_version = self._get_next_work_file_version(work_template, fields)
+        fields["version"] = next_version 
+        new_scene_path = work_template.apply_fields(fields)
+        
+        # log info
+        self.parent.log_debug("Version up work file %s --> %s..." % (scene_path, new_scene_path))
+        
+        # rename and save the file
+        progress_cb(50, "Saving the scene file")
+        shotgunsupport.save_scene_as(new_scene_path)
+        
+        progress_cb(100)
+
 
     def _get_next_work_file_version(self, work_template, fields):
         """
