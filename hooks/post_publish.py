@@ -68,6 +68,10 @@ class PostPublishHook(Hook):
         elif engine_name == "tk-mari":
             self._do_mari_post_publish(work_template, progress_cb)            
         elif engine_name == "tk-modo":
+            # The Modo engine is not supported by Shotgun but has been graciously
+            # contributed to the community by Walking The Dog and Lutz Pälike.
+            # It can be found at:
+            # https://github.com/tremolo/tk-modo
             self._do_modo_post_publish(work_template, progress_cb)     
         else:
             raise TankError("Unable to perform post publish for unhandled engine %s" % engine_name)
@@ -404,6 +408,11 @@ class PostPublishHook(Hook):
         """
         Do any Modo post-publish work
 
+        The Modo engine is not supported by Shotgun but has been graciously
+        contributed to the community by Walking The Dog and Lutz Pälike.
+        It can be found at:
+        https://github.com/tremolo/tk-modo
+            
         :param work_template:   The primary work template used for the publish
         :param progress_cb:     Callback to be used when reporting progress
         """        
