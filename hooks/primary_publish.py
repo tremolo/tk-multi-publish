@@ -98,6 +98,10 @@ class PrimaryPublishHook(Hook):
         elif engine_name == "tk-mari":
             return self._do_mari_publish(task, work_template, comment, thumbnail_path, sg_task, progress_cb)        
         elif engine_name == "tk-modo":
+            # The Modo engine is not supported by Shotgun but has been graciously
+            # contributed to the community by Walking The Dog and Lutz Pälike.
+            # It can be found at:
+            # https://github.com/tremolo/tk-modo
             return self._do_modo_publish(task, work_template, comment, thumbnail_path, sg_task, progress_cb)        
         else:
             raise TankError("Unable to perform publish for unhandled engine %s" % engine_name)
@@ -930,6 +934,11 @@ class PrimaryPublishHook(Hook):
     def _do_modo_publish(self, task, work_template, comment, thumbnail_path, sg_task, progress_cb):
         """
         Publish the main Modo scene
+
+        The Modo engine is not supported by Shotgun but has been graciously
+        contributed to the community by Walking The Dog and Lutz Pälike.
+        It can be found at:
+        https://github.com/tremolo/tk-modo
 
         :param task:            The primary task to publish
         :param work_template:   The primary work template to use
