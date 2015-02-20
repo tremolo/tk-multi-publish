@@ -85,6 +85,10 @@ class PrimaryPrePublishHook(Hook):
         elif engine_name == "tk-mari":
             return self._do_mari_pre_publish(task, work_template, progress_cb)
         elif engine_name == "tk-modo":
+            # The Modo engine is not supported by Shotgun but has been graciously
+            # contributed to the community by Walking The Dog and Lutz Pälike.
+            # It can be found at:
+            # https://github.com/tremolo/tk-modo
             return self._do_modo_pre_publish(task, work_template, progress_cb)
         else:
             raise TankError("Unable to perform pre-publish for unhandled engine %s" % engine_name)
@@ -374,6 +378,11 @@ class PrimaryPrePublishHook(Hook):
         """
         Do Maya primary pre-publish/scene validation
 
+        The Modo engine is not supported by Shotgun but has been graciously
+        contributed to the community by Walking The Dog and Lutz Pälike.
+        It can be found at:
+        https://github.com/tremolo/tk-modo
+        
         :param task:            The primary task to pre-publish
         :param work_template:   The primary work template to use
         :param progress_cb:     A callback to use when reporting any progress
