@@ -940,13 +940,13 @@ class PrimaryPublishHook(Hook):
                                 to the UI
         :returns:               The path to the file that has been published        
         """
-        import shotgunsupport
+        import modoshotgunsupport
         
         progress_cb(0.0, "Finding scene dependencies", task)
         dependencies = self._modo_find_additional_scene_dependencies()
         
         # get scene path
-        scene_path = os.path.abspath(shotgunsupport.get_scene_filename())
+        scene_path = os.path.abspath(modoshotgunsupport.get_scene_filename())
         
         if not work_template.validate(scene_path):
             raise TankError("File '%s' is not a valid work path, unable to publish!" % scene_path)
@@ -964,7 +964,7 @@ class PrimaryPublishHook(Hook):
         # save the scene:
         progress_cb(10.0, "Saving the scene")
         self.parent.log_debug("Saving the scene...")
-        shotgunsupport.save_scene()
+        modoshotgunsupport.save_scene()
         
         # copy the file:
         progress_cb(50.0, "Copying the file")
@@ -998,10 +998,10 @@ class PrimaryPublishHook(Hook):
         """
         Find additional dependencies from the scene
         """
-        import shotgunsupport
+        import modoshotgunsupport
         
         dependencies = []
-        dependencies.extend(shotgunsupport.get_references())
+        dependencies.extend(modoshotgunsupport.get_references())
 
         return dependencies
     

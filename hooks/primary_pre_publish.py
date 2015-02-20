@@ -381,11 +381,11 @@ class PrimaryPrePublishHook(Hook):
         :returns:               A list of any errors or problems that were found
                                 during pre-publish
         """
-        import shotgunsupport        
+        import modoshotgunsupport        
         progress_cb(0.0, "Validating current scene", task)
         
         # get the current scene file:
-        scene_file = shotgunsupport.get_scene_filename()
+        scene_file = modoshotgunsupport.get_scene_filename()
         if scene_file:
             scene_file = os.path.abspath(scene_file)
             

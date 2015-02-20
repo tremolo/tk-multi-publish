@@ -407,12 +407,12 @@ class PostPublishHook(Hook):
         :param work_template:   The primary work template used for the publish
         :param progress_cb:     Callback to be used when reporting progress
         """        
-        import shotgunsupport
+        import modoshotgunsupport
         
         progress_cb(0, "Versioning up the scene file")
         
         # get the current scene path:
-        scene_path = os.path.abspath(shotgunsupport.get_scene_filename())
+        scene_path = os.path.abspath(modoshotgunsupport.get_scene_filename())
         
         # increment version and construct new file name:
         progress_cb(25, "Finding next version number")
@@ -426,7 +426,7 @@ class PostPublishHook(Hook):
         
         # rename and save the file
         progress_cb(50, "Saving the scene file")
-        shotgunsupport.save_scene_as(new_scene_path)
+        modoshotgunsupport.save_scene_as(new_scene_path)
         
         progress_cb(100)
 

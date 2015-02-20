@@ -13,7 +13,6 @@ import os
 import tank
 from tank import Hook
 from tank import TankError
-import shotgunsupport
 
 class ScanSceneHook(Hook):
     """
@@ -53,11 +52,12 @@ class ScanSceneHook(Hook):
                                             pre-publish and publish hooks
                         }
         """   
-                
+        import modoshotgunsupport
+        
         items = []
         
         # get the main scene:
-        scene_name = shotgunsupport.get_scene_filename()
+        scene_name = modoshotgunsupport.get_scene_filename()
         if not scene_name:
             raise TankError("Please Save your file before Publishing")
         
@@ -71,7 +71,7 @@ class ScanSceneHook(Hook):
         # add a geometry item to the list:
         
 
-        if shotgunsupport.get_meshes():
+        if modoshotgunsupport.get_meshes():
             items.append({"type":"geometry", "name":"All Scene Geometry"})
 
         return items
